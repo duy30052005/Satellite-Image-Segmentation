@@ -16,14 +16,13 @@ Dự án ứng dụng Deep Learning (Thị giác máy tính) để tự động 
    * **Đặc điểm:** Bao gồm hình ảnh vệ tinh tại các khu vực Châu Âu và Châu Mỹ. 
    * **Thế mạnh:** Cực kỳ phù hợp để nhận diện các vùng nông thôn, ngoại ô, hoặc khu vực đô thị có mật độ thấp xen lẫn với rừng cây và thảm thực vật.
    * **Định dạng nhãn (Mask):** Được đánh dấu chi tiết bằng kênh màu đa sắc (RGB).
-   * **Link tải dữ liệu:** [Kaggle - DeepGlobe Land Cover]([link_dataset_deepglobe_cua_ban](https://www.kaggle.com/datasets/balraj98/deepglobe-land-cover-classification-dataset))
+   * **Link tải dữ liệu:** [Kaggle - DeepGlobe Land Cover](https://www.kaggle.com/datasets/balraj98/deepglobe-land-cover-classification-dataset)
 
 2. **LoveDA (Land-Cover Domain Adaptive):**
    * **Đặc điểm:** Tập trung vào các hình ảnh vệ tinh tại các siêu đô thị lớn của Trung Quốc (như Vũ Hán...).
    * **Thế mạnh:** Tối ưu hóa khả năng nhận diện của mô hình tại các khu vực có mật độ đô thị hóa cực cao, nhà cửa san sát và cấu trúc giao thông phức tạp.
    * **Định dạng nhãn (Mask):** Được đánh dấu bằng kênh xám đơn sắc (1-channel Grayscale).
-   * **Link tải dữ liệu:** [Kaggle - LoveDA Dataset]([link_dataset_loveda_cua_ban](https://www.kaggle.com/datasets/mohammedjaveed/loveda-dataset))
-
+   * **Link tải dữ liệu:** [Kaggle - LoveDA Dataset](https://www.kaggle.com/datasets/mohammedjaveed/loveda-dataset)
 *(Lưu ý: Quá trình tiền xử lý đã được tùy chỉnh để đồng nhất hóa hai loại định dạng Mask (RGB và Grayscale) vào chung một pipeline huấn luyện).*
 
 ## 🧠 Kiến trúc Mô hình (Model Architecture)
