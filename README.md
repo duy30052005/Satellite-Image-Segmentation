@@ -1,70 +1,63 @@
 # 🌍 Satellite Image Segmentation with U-Net & ResNet-50
 
 ## 📝 Giới thiệu
-Dự án ứng dụng Deep Learning (Thị giác máy tính) để tự động nhận diện, phân loại và trích xuất ranh giới địa hình từ hình ảnh vệ tinh. Mô hình được thiết kế để giải quyết bài toán Semantic Segmentation (Phân đoạn ngữ nghĩa) ở cấp độ điểm ảnh (pixel-level), hỗ trợ ứng dụng trong quy hoạch đô thị, giám sát môi trường và nông nghiệp.
+Dự án ứng dụng Deep Learning (Thị giác máy tính) để tự động nhận diện, phân loại và trích xuất ranh giới địa hình từ hình ảnh vệ tinh. Mô hình được thiết kế để giải quyết bài toán Semantic Segmentation (Phân đoạn ngữ nghĩa) ở cấp độ điểm ảnh (pixel-level), hỗ trợ ứng dụng trong quy hoạch đô thị và giám sát môi trường.
 
 ## 🚀 Công nghệ và Nền tảng
-* **Ngôn ngữ:** Python
-* **Môi trường huấn luyện:** Kaggle Notebooks (Tận dụng sức mạnh xử lý song song của GPU).
-* **Kiến trúc Mô hình:** **U-Net** kết hợp với **ResNet-50** Backbone.
-* **Thư viện chính:** PyTorch / TensorFlow (Keras), OpenCV, NumPy, Matplotlib, Scikit-learn.
+* **Ngôn ngữ:** Python 3.12
+* **Framework:** PyTorch (với thư viện `segmentation-models-pytorch`)
+* **Môi trường huấn luyện:** Kaggle Notebooks (GPU Tesla T4/P100)
+* **Kiến trúc:** **U-Net** kết hợp **ResNet-50** Backbone (Transfer Learning)
+* **Thư viện bổ trợ:** Albumentations, OpenCV, NumPy, Tqdm, Gc
 
-## 🗂️ Tập dữ liệu (Datasets)
-Để đảm bảo mô hình có khả năng tổng quát hóa cao (Generalization) trên nhiều loại địa hình và mật độ dân cư khác nhau, dự án sử dụng kết hợp hai bộ dữ liệu vệ tinh lớn:
+## 🗂️ Tập dữ liệu & Chiến lược Mapping (Datasets)
+Dự án kết hợp hai bộ dữ liệu lớn để tối ưu khả năng nhận diện trên nhiều đặc điểm địa lý khác nhau:
 
-1. **DeepGlobe Land Cover Classification:**
-   * **Đặc điểm:** Bao gồm hình ảnh vệ tinh tại các khu vực Châu Âu và Châu Mỹ. 
-   * **Thế mạnh:** Cực kỳ phù hợp để nhận diện các vùng nông thôn, ngoại ô, hoặc khu vực đô thị có mật độ thấp xen lẫn với rừng cây và thảm thực vật.
-   * **Định dạng nhãn (Mask):** Được đánh dấu chi tiết bằng kênh màu đa sắc (RGB).
-   * **Link tải dữ liệu:** [Kaggle - DeepGlobe Land Cover](https://www.kaggle.com/datasets/balraj98/deepglobe-land-cover-classification-dataset)
+1. **DeepGlobe Land Cover:** Ảnh vệ tinh khu vực Âu Mỹ, nhãn định dạng **RGB (3 kênh màu)**.
+   * [Link tải dữ liệu](https://www.kaggle.com/datasets/balraj98/deepglobe-land-cover-classification-dataset)
+2. **LoveDA:** Ảnh vệ tinh siêu đô thị tại Trung Quốc (Vũ Hán...), nhãn định dạng **Grayscale (1 kênh xám)**.
+   * [Link tải dữ liệu](https://www.kaggle.com/datasets/mohammedjaveed/loveda-dataset)
 
-2. **LoveDA (Land-Cover Domain Adaptive):**
-   * **Đặc điểm:** Tập trung vào các hình ảnh vệ tinh tại các siêu đô thị lớn của Trung Quốc (như Vũ Hán...).
-   * **Thế mạnh:** Tối ưu hóa khả năng nhận diện của mô hình tại các khu vực có mật độ đô thị hóa cực cao, nhà cửa san sát và cấu trúc giao thông phức tạp.
-   * **Định dạng nhãn (Mask):** Được đánh dấu bằng kênh xám đơn sắc (1-channel Grayscale).
-   * **Link tải dữ liệu:** [Kaggle - LoveDA Dataset](https://www.kaggle.com/datasets/mohammedjaveed/loveda-dataset)
-*(Lưu ý: Quá trình tiền xử lý đã được tùy chỉnh để đồng nhất hóa hai loại định dạng Mask (RGB và Grayscale) vào chung một pipeline huấn luyện).*
+### 🎯 Bảng Mapping nhãn đồng nhất (Label Encoding)
+Hệ thống sử dụng kỹ thuật xử lý ảnh để đưa các giá trị màu và pixel về các lớp đối tượng chuẩn:
 
-## 🧠 Kiến trúc Mô hình (Model Architecture)
-Thay vì sử dụng U-Net truyền thống, dự án áp dụng kỹ thuật Transfer Learning để tối ưu hóa khả năng trích xuất đặc trưng:
-* **Encoder (Bộ mã hóa - ResNet-50):** Sử dụng các trọng số (weights) đã được huấn luyện trước (pre-trained) của mạng ResNet-50. Khối kiến trúc này đóng vai trò trích xuất các đặc trưng không gian phức tạp từ ảnh vệ tinh mà không gặp hiện tượng suy biến đạo hàm (vanishing gradient).
-* **Decoder (Bộ giải mã - U-Net):** Phục hồi lại độ phân giải ban đầu của ảnh, sử dụng các kết nối tắt (Skip Connections) từ Encoder sang Decoder để giữ lại các thông tin vị trí chi tiết, giúp ranh giới các vật thể được cắt biên sắc nét và chính xác hơn.
+| STT | Lớp đối tượng (Class) | Màu DeepGlobe (RGB) | Giá trị LoveDA (Pixel) |
+|:---:|:---|:---:|:---:|
+| 0 | **Background / Unknown** | (0, 0, 0) | 0 |
+| 1 | **Urban (Building/Road)** | (0, 255, 255) | 1, 2 |
+| 2 | **Agriculture** | (255, 255, 0) | 6 |
+| 3 | **Forest** | (0, 255, 0) | 5 |
+| 4 | **Water** | (0, 0, 255) | 3 |
+| 5 | **Barren** | (255, 255, 255) | 4 |
+| 6 | **Rangeland** | (255, 0, 255) | - |
 
-## 💡 Luồng xử lý dữ liệu (Workflow)
+## 🧠 Kỹ thuật Huấn luyện đặc trưng (Technical Implementation)
 
-### 1. Tiền xử lý dữ liệu (Data Preprocessing & Augmentation)
-* Đọc, giải mã và đồng nhất định dạng cho hai tập dữ liệu DeepGlobe và LoveDA.
-* Áp dụng các kỹ thuật Data Augmentation (Xoay, lật, thay đổi độ sáng/độ tương phản, cắt ngẫu nhiên) để làm phong phú dữ liệu, giúp mô hình tăng cường độ mạnh mẽ và tránh Overfitting.
+* **Smart Data Loading:** Xây dựng lớp `KaggleCombinedDataset` tự động ánh xạ Mask dựa trên tiền tố file (`DG_` hoặc `LDA_`), xử lý ngoại lệ file lỗi để đảm bảo luồng huấn luyện liên tục.
+* **Combo Loss Function:** Kết hợp `DiceLoss` (giúp biên vật thể sắc nét) và `CrossEntropyLoss` (tối ưu độ chính xác pixel).
+* **Augmentation:** Sử dụng **Albumentations** (`HorizontalFlip`, `VerticalFlip`, `RandomRotate90`, `Normalize ImageNet`) để tăng tính bền vững cho mô hình.
+* **Tối ưu phần cứng:** Quản lý bộ nhớ GPU hiệu quả thông qua `gc.collect()`, `torch.cuda.empty_cache()` và `pin_memory=True` để tránh lỗi Out-of-Memory (OOM).
 
-### 2. Huấn luyện (Training)
-* Tận dụng bộ tăng tốc phần cứng (GPU) trên Kaggle để xử lý hàng nghìn epoch cho tập dữ liệu hình ảnh lớn.
-* Lựa chọn hàm mất mát (Loss Function) phù hợp cho bài toán phân đoạn nhiều lớp.
-
-### 3. Đánh giá (Evaluation Metrics)
-Mô hình được đánh giá qua các thang đo chuẩn trong bài toán Segmentation:
-* **IoU (Intersection over Union) / Jaccard Index:** Đánh giá độ trùng khớp giữa vùng dự đoán và thực tế.
-* **Dice Coefficient (F1-Score):** Đo lường độ tương đồng của tập hợp pixel.
-* **Pixel Accuracy:** Tỷ lệ phần trăm các điểm ảnh được phân loại đúng.
-
-## 📂 Cấu trúc Repository
-* `notebooke683bcc9b9.ipynb`: Kaggle Notebook chứa toàn bộ mã nguồn từ khâu tải dữ liệu, xây dựng Custom DataLoader xử lý RGB/Grayscale Mask, định nghĩa kiến trúc U-Net + ResNet-50, vòng lặp huấn luyện (Training loop) và trực quan hóa kết quả dự đoán.
+## 📂 Cấu trúc mã nguồn
+```text
+.
+├── notebooke683bcc9b9.ipynb    # File chạy chính trên Kaggle (Data -> Train -> Eval)
+└── unet_resnet50_V3_Master.pth # File trọng số mô hình sau khi huấn luyện
+```
 
 ## 📊 Minh họa Kết quả (Results)
 
+
+
 | Ảnh Vệ tinh Gốc | Ground Truth Mask | Kết quả Dự đoán (Prediction) |
 |:---:|:---:|:---:|
-| ![Original](link_anh_goc_cua_ban) | ![Truth](link_anh_thuc_te_cua_ban) | ![Pred](link_anh_du_doan_cua_ban) |
-
----
+| ![Original](https://github.com/user-attachments/assets/link_anh_goc) | ![Truth](https://github.com/user-attachments/assets/link_anh_thuc_te) | ![Pred](https://github.com/user-attachments/assets/link_anh_du_doan) |
 
 ## 🛠 Hướng dẫn trải nghiệm
-
-Vì mô hình được huấn luyện trên môi trường Kaggle với dữ liệu lớn, cách tốt nhất để xem và chạy lại dự án là thông qua Jupyter Notebook:
-1. Clone repository này về máy hoặc tải trực tiếp file `.ipynb`.
-2. Tải file `.ipynb` lên Kaggle hoặc Google Colab.
-3. Tải hai bộ dữ liệu `DeepGlobe Land Cover` và `LoveDA` thông qua các link đính kèm ở trên và import vào môi trường.
-4. Bật chế độ tăng tốc GPU (Runtime > Change runtime type > GPU).
-5. Chạy tuần tự các Cell để xem quá trình huấn luyện và kết quả trực quan ở cuối file.
+1. Tải file `.ipynb` lên môi trường Kaggle.
+2. Thêm 2 bộ dữ liệu `DeepGlobe` và `LoveDA` vào phần Input.
+3. Kích hoạt **GPU T4 x2** hoặc **P100**.
+4. Chạy toàn bộ các cell để thực hiện huấn luyện (mặc định 40 Epochs) và kiểm tra kết quả trực quan ở cuối Notebook.
 
 ## 👥 Tác giả
 * **Tâm Khang** - AI/Data Engineer Intern
