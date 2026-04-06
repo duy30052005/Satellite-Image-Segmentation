@@ -59,4 +59,5 @@ Hệ thống sử dụng kỹ thuật xử lý ảnh để đưa các giá trị
 4. Chạy toàn bộ các cell để thực hiện huấn luyện (mặc định 40 Epochs) và kiểm tra kết quả trực quan ở cuối Notebook.
 
 ## 👥 Tác giả
-* **Tâm Khang** - AI/Data Engineer Intern
+
+* **Huỳnh Bá Duy** - AI/Data Engineer Intern | Trường Đại học Công nghệ Thông tin và Truyền thông Việt - Hàn (VKU).
