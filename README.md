@@ -49,9 +49,11 @@ Hệ thống sử dụng kỹ thuật xử lý ảnh để đưa các giá trị
 
 
 
-| Ảnh Vệ tinh Gốc | Ground Truth Mask | Kết quả Dự đoán (Prediction) |
+| Ảnh Vệ tinh Gốc | Kết quả Dự đoán (Prediction) |
 |:---:|:---:|:---:|
-| ![Original](https://github.com/user-attachments/assets/link_anh_goc) | ![Truth](https://github.com/user-attachments/assets/link_anh_thuc_te) | ![Pred](https://github.com/user-attachments/assets/link_anh_du_doan) |
+| ![Original](<img width="722" height="720" alt="image" src="https://github.com/user-attachments/assets/10e947d0-07f2-4d80-b0d0-af5b276952c9" />
+)  | ![Pred](<img width="721" height="720" alt="image" src="https://github.com/user-attachments/assets/a119804f-810d-4280-8e32-b1cda520d1e1" />
+) |
 
 ## 🛠 Hướng dẫn trải nghiệm
 1. Tải file `.ipynb` lên môi trường Kaggle.
